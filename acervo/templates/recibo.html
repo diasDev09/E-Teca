@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h2 class="fw-bold text-primary">
+        <i class="bi bi-file-earmark-check"></i> Recibo de Devolução
+    </h2>
+    <p class="text-muted">Comprovante gerado em {{ emprestimo.data_devolvido|date:"d/m/Y H:i" }}</p>
+</div>
+
+<hr>
+
+<div class="row mt-4">
+    <div class="col-md-6 border-end">
+        <h5 class="text-secondary mb-3"><i class="bi bi-person"></i> Detalhes do Usuário</h5>
+        <p><strong>Nome:</strong> {{ emprestimo.usuario.username }}</p>
+        <p><strong>Livro:</strong> {{ emprestimo.livro.titulo }}</p>
+        <p><strong>Autor:</strong> {{ emprestimo.livro.autor }}</p>
+    </div>
+
+    <div class="col-md-6 ps-md-4">
+        <h5 class="text-secondary mb-3"><i class="bi bi-calendar3"></i> Prazos e Datas</h5>
+        <ul class="list-unstyled">
+            <li class="mb-2">
+                <span class="text-muted">Data do Empréstimo:</span> 
+                <span class="badge bg-light text-dark border">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</span>
+            </li>
+            <li class="mb-2">
+                <span class="text-muted">Data Prevista:</span> 
+                <span class="badge bg-light text-dark border">{{ emprestimo.data_prevista|date:"d/m/Y" }}</span>
+            </li>
+            <li class="mb-2">
+                <span class="text-muted">Data da Devolução:</span> 
+                <span class="badge bg-info text-white">{{ emprestimo.data_devolvido|date:"d/m/Y" }}</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert {% if emprestimo.multa > 0 %}alert-danger{% else %}alert-success{% endif %} d-flex align-items-center" role="alert">
+            <i class="bi {% if emprestimo.multa > 0 %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %} fs-4 me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-0">
+                    Situação Financeira: 
+                    <strong>
+                        {% if emprestimo.multa > 0 %}
+                            Multa de R$ {{ emprestimo.multa }}
+                        {% else %}
+                            Sem pendências (Devolução no prazo)
+                        {% endif %}
+                    </strong>
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mt-5 no-print">
+    <a href="{% url 'listar_livros' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar ao Acervo
+    </a>
+    <button onclick="window.print()" class="btn btn-dark">
+        <i class="bi bi-printer"></i> Imprimir Recibo
+    </button>
+</div>
+
+<style>
+    @media print {
+        .no-print, .navbar, footer {
+            display: none !important;
+        }
+        .content-card {
+            box-shadow: none !important;
+            border: none !important;
+        }
+    }
+</style>
+{% endblock %}

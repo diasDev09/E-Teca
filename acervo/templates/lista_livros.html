@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Nosso Acervo</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Quantidade</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for livro in livros %}
+        <tr>
+            <td>{{ livro.titulo }}</td>
+            <td>{{ livro.autor }}</td>
+            <td>{{ livro.quantidade }}</td>
+            <td>
+                {% if livro.quantidade > 0 %}
+                    <span class="badge bg-success">Disponível</span>
+                    <a href="{% url 'pegar_livro' livro.id %}" class="btn btn-primary"><i class="bi bi-book"></i>Pegar Emprestado</a>
+                {% else %}
+                    <span class="badge bg-danger">Esgotado</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from acervo import views
 
 urlpatterns = [
+    path('', views.home, name='home'),
+    path('livros/', views.listar_livros, name='listar_livros'),
+    path('devolver/<int:emprestimo_id>/', views.devolver_livro, name='devolver_livro'),
     path('admin/', admin.site.urls),
 ]

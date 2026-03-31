@@ -1,15 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User # Importação do User padrão do Django
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
-from .models import Livro, Usuario, Emprestimo
+from .models import Livro, Emprestimo # Usuario foi removido daqui
 
 @login_required
 def home(request):
-    return render(request, 'home.html') # Removida a barra inicial
+    # Pega apenas os empréstimos do usuário logado que ainda não foram devolvidos
+    meus_emprestimos = Emprestimo.objects.filter(
+        usuario=request.user, 
+        data_devolvido__isnull=True
+    ).select_related('livro')
+    
+    return render(request, 'home.html', {'emprestimos': meus_emprestimos})
 
 def signup(request):
     if request.method == 'POST':
@@ -23,12 +30,13 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 # LISTAR LIVROS
+@login_required
 def listar_livros(request):
     livros = Livro.objects.all()
     return render(request, 'lista_livros.html', {'livros': livros})
 
 # PEGAR LIVRO (EMPRÉSTIMO)
-# Removi o usuario_id dos parâmetros para usar o request.user
+@login_required
 def pegar_livro(request, livro_id):
     livro = get_object_or_404(Livro, pk=livro_id)
     usuario = request.user  # Pega o usuário que está logado
@@ -57,6 +65,7 @@ def pegar_livro(request, livro_id):
     return redirect('listar_livros')
 
 # DEVOLVER LIVRO E CALCULAR MULTA
+@login_required
 def devolver_livro(request, emprestimo_id):
     emprestimo = get_object_or_404(Emprestimo, pk=emprestimo_id)
     
@@ -75,6 +84,3 @@ def devolver_livro(request, emprestimo_id):
         emprestimo.save()
 
     return render(request, 'recibo.html', {'emprestimo': emprestimo})
-
-def home(request):
-    return render(request, 'home.html')
